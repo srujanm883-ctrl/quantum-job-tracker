@@ -1,0 +1,163 @@
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.header {
+    background: linear-gradient(90deg, #5c2d91, #8a4cb0);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.quantum-tracker {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stats-card, .job-table-section, .chart-container {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #4a148c;
+}
+
+.card-content p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+.recent-jobs .job-counts {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.job-count {
+    text-align: center;
+}
+
+.job-count span {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #5c2d91;
+}
+
+.job-count p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: #777;
+}
+
+.job-controls {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.quantum-button {
+    background: linear-gradient(45deg, #4a148c, #6a1b9a);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quantum-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.job-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.job-table th, .job-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.job-table th {
+    background-color: #f8f9fa;
+    color: #555;
+    font-weight: 600;
+}
+
+.job-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.status-completed {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-queued {
+    color: #FFC107;
+    font-weight: bold;
+}
+
+.status-rejected {
+    color: #F44336;
+    font-weight: bold;
+}
+
+.chart-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#loading {
+    text-align: center;
+    color: #888;
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}

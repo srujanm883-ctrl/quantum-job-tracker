@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Job Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1 class="quantum-tracker">QUANTUM JOB TRACKER</h1>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h2 class="card-title">Open Plan</h2>
+                <div class="card-content">
+                    <p>Free details | Upgrade</p>
+                    <p>Up to 10 minutes/month</p>
+                </div>
+            </div>
+            <div class="stats-card">
+                <h2 class="card-title">Monthly usage</h2>
+                <div class="card-content">
+                    <p>Used: 0m</p>
+                    <p>Remaining: 10m</p>
+                </div>
+            </div>
+            <div class="stats-card recent-jobs">
+                <h2 class="card-title">Recent jobs</h2>
+                <div class="job-counts">
+                    <div class="job-count">
+                        <span id="pendingJobsCount">0</span>
+                        <p>Pending jobs</p>
+                    </div>
+                    <div class="job-count">
+                        <span id="runningJobsCount">0</span>
+                        <p>Running jobs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="new-jobs-section stats-card">
+            <h2 class="card-title">New Quantum Job Roles</h2>
+            <ul id="newJobRolesList">
+                <li>
+                    <strong>Quantum Information and Error Correction Theorist:</strong> Expertise in quantum mechanics, programming (such as Qiskit), and problem-solving.
+                    <br><em>Salary: $120,000 - $175,000 / yr</em>
+                </li>
+                <li>
+                    <strong>Research Scientist:</strong> Background in quantum mechanics, algorithms, and/or physics.
+                    <br><em>Salary: $89,500 - $156,000 / yr</em>
+                </li>
+                <li>
+                    <strong>Quantum Research Scientist:</strong> Conduct groundbreaking research into new superconducting microwave devices and develop new ways to operate them.
+                    <br><em>Salary: $89,500 - $156,000 / yr</em>
+                </li>
+                <li>
+                    <strong>Quantum Hardware Engineer:</strong> Experience with superconducting qubits, cryoelectronics, and/or microwave engineering.
+                    <br><em>Salary: $89,500 - $156,000 / yr</em>
+                </li>
+                <li>
+                    <strong>Quantum Software Developer:</strong> Experience with software development for quantum computing tools and cloud services.
+                    <br><em>Salary: $89,500 - $156,000 / yr</em>
+                </li>
+            </ul>
+        </div>
+
+        <div class="job-table-section">
+            <h2 class="card-title">Recent Jobs</h2>
+            <div class="job-controls">
+                <button id="submitRunningJobBtn" class="quantum-button">Running Quantum Job</button>
+            </div>
+            <div class="table-container">
+                <p id="loading" class="loading hidden">Submitting job...</p>
+                <table class="job-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Status</th>
+                            <th>Backend</th>
+                            <th>Qubits</th>
+                            <th>Shots</th>
+                            <th>Submission Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Failed to load job data. Please ensure the backend server is running.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h2 class="card-title">Job Status Analysis</h2>
+            <canvas id="jobStatusChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitBtn = document.getElementById('submitRunningJobBtn');
+            const loadingText = document.getElementById('loading');
+            const jobTableBody = document.getElementById('jobTableBody');
+            const pendingJobsCount = document.getElementById('pendingJobsCount');
+            const runningJobsCount = document.getElementById('runningJobsCount');
+            const ctx = document.getElementById('jobStatusChart').getContext('2d');
+            
+            let jobStatusData = {
+                labels: ['Completed', 'Running', 'Rejected'],
+                datasets: [{
+                    data: [0, 3, 0],
+                    backgroundColor: ['#4ade80', '#2563eb', '#ef4444'],
+                }]
+            };
+
+            const jobStatusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: jobStatusData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Job Status Breakdown'
+                        }
+                    }
+                }
+            });
+
+            const backends = ['ibmq_lima', 'ibmq_belem', 'ibmq_jakarta', 'simulator_statevector'];
+
+            // Initial state check
+            if (jobTableBody.rows.length === 1 && jobTableBody.rows[0].cells[0].innerText.includes("Failed to load")) {
+                jobTableBody.innerHTML = '';
+            }
+
+            // Function to generate a new random job
+            function generateRandomJob() {
+                const statuses = ['Completed', 'Running', 'Rejected'];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                const randomBackend = backends[Math.floor(Math.random() * backends.length)];
+                const randomQubits = Math.floor(Math.random() * 5) + 5; // 5 to 9 qubits
+                const randomShots = (Math.floor(Math.random() * 10) + 1) * 1024; // 1024, 2048, etc.
+
+                return {
+                    id: Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    status: randomStatus,
+                    backend: randomBackend,
+                    qubits: randomQubits,
+                    shots: randomShots,
+                    submissionTime: new Date().toLocaleTimeString(),
+                };
+            }
+
+            // Function to update the chart and job counts
+            function updateDashboard(job) {
+                const statusIndex = jobStatusData.labels.indexOf(job.status);
+                if (statusIndex !== -1) {
+                    jobStatusData.datasets[0].data[statusIndex]++;
+                    jobStatusChart.update();
+                }
+
+                if (job.status === 'Running') {
+                    runningJobsCount.innerText = parseInt(runningJobsCount.innerText) + 1;
+                } else if (job.status === 'Queued') { // This condition is now unreachable but kept for clarity
+                    pendingJobsCount.innerText = parseInt(pendingJobsCount.innerText) + 1;
+                }
+            }
+
+            // Function to add a job to the table
+            function addJobToTable(job) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${job.id}</td>
+                    <td>${job.status}</td>
+                    <td>${job.backend}</td>
+                    <td>${job.qubits}</td>
+                    <td>${job.shots}</td>
+                    <td>${job.submissionTime}</td>
+                `;
+                jobTableBody.prepend(newRow); // Add to top of the table
+            }
+
+            // Click event listener for the button
+            submitBtn.addEventListener('click', () => {
+                loadingText.classList.remove('hidden');
+                submitBtn.disabled = true;
+
+                // Simulate a network request delay
+                setTimeout(() => {
+                    const newJob = generateRandomJob();
+                    addJobToTable(newJob);
+                    updateDashboard(newJob);
+
+                    loadingText.classList.add('hidden');
+                    submitBtn.disabled = false;
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
